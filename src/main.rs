@@ -17,7 +17,7 @@ fn main() -> Result<(), error::AppError> {
 
     rl.set_target_fps(60);
 
-    let plugin_manager = PluginManager::new("scripts", "Raylib Lua API").expect("Error loading scripts");
+    let plugin_manager = PluginManager::new("scripts").expect("Error loading scripts");
     let mut surface: Surface = Surface::new(window_size);
 
     let title = "Hey! :)";

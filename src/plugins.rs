@@ -12,14 +12,12 @@ pub struct Plugin {
 
 #[derive(Debug, Default)]
 pub struct PluginManager {
-    app_name: String,
     plugins: HashMap<String, Plugin>
 }
 
 impl PluginManager {
-    pub fn new(plugin_dir: impl Into<PathBuf>, app_name: impl Into<String>) -> Result<Self, PluginError> {
+    pub fn new(plugin_dir: impl Into<PathBuf>) -> Result<Self, PluginError> {
         let mut manager = Self {
-            app_name: app_name.into(),
             ..Default::default()
         };
 
@@ -31,7 +29,6 @@ impl PluginManager {
                 file.read_to_string(&mut file_buffer)?;
 
                 let lua = Lua::new();
-                lua.globals().set("APP_NAME", manager.app_name.as_str())?;
                 lua.load(file_buffer).exec()?;
 
                 let name = lua.globals().get::<_, String>("PLUGIN_NAME").map_err(|_|PluginError::PluginNameMissing(entry.as_ref().unwrap().file_name().into_string().unwrap()))?;
