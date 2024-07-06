@@ -2,7 +2,7 @@ use mlua::UserData;
 use raylib::drawing::RaylibDrawHandle;
 use std::collections::VecDeque;
 
-use crate::shapes::{DrawShape, Circle};
+use crate::{plugins::Plugin, shapes::{Circle, DrawShape}};
 
 #[derive(Default)]
 pub struct WindowSize(pub i32, pub i32);
@@ -23,7 +23,26 @@ impl Surface {
             shape.draw(draw_handle);
         }
     }
+
+    pub fn populate_from_plugin(&mut self, plugin: &Plugin) -> mlua::Result<()> {
+        plugin.state.scope(|scope| {
+            let surface = scope.create_userdata_ref_mut(self)?;
+            if let Ok(draw) = plugin.state.globals().get::<_, mlua::Function>("Draw") {
+                draw.call(surface)?
+            }
+            Ok(())
+        })?;
+        Ok(())
+    }
+
+    pub fn populate_from_plugins(&mut self, plugins: Vec<&Plugin>) -> mlua::Result<()> {
+        for plugin in plugins.iter() {
+            self.populate_from_plugin(plugin)?;
+        }
+        Ok(())
+    }
 }
+
 
 impl UserData for Surface {
     fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
