@@ -8,6 +8,6 @@ function Update()
 end
 
 function Draw(screen)
-    screen:draw_circle(CIRCLE_POS[1], screen.size.y / 2 - 100, 20)
-    screen:draw_circle(CIRCLE_POS[2], screen.size.y / 2 + 100, 20)
+    screen:draw_circle(CIRCLE_POS[1], screen.size.y / 2 - 100, 20, "blue")
+    screen:draw_circle(CIRCLE_POS[2], screen.size.y / 2 + 100, 20, "red")
 end
