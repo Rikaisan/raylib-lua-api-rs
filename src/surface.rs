@@ -1,4 +1,4 @@
-use crate::{error::PluginError, plugins::PluginManager, shapes::{Circle, ColorMap, DrawShape}};
+use crate::{error::PluginError, plugins::PluginManager, shapes::*};
 use raylib::{color::Color, drawing::RaylibDrawHandle};
 use std::collections::VecDeque;
 use mlua::UserData;
@@ -44,6 +44,18 @@ impl UserData for Surface {
                 surface.shapes.push_back(
                     Box::new(
                         Circle::new(x, y, radius, color_map.from(color).unwrap_or(Color::BLACK))
+                    )
+                )
+            )
+        });
+
+        methods.add_method_mut("draw_rectangle", |_, surface, (x, y, width, height, color)| {
+            let color: String = color;
+            let color_map = ColorMap::default();
+            Ok(
+                surface.shapes.push_back(
+                    Box::new(
+                        Rectangle::new(x, y, width, height, color_map.from(color).unwrap_or(Color::BLACK))
                     )
                 )
             )

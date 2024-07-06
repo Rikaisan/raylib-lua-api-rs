@@ -1,6 +1,8 @@
 mod shape;
-mod circle;
 mod colors;
+mod circle;
+mod rectangle;
 pub use shape::*;
-pub use circle::*;
 pub use colors::*;
+pub use circle::*;
+pub use rectangle::*;
