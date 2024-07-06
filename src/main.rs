@@ -4,7 +4,7 @@ mod shapes;
 mod error;
 
 use error::*;
-use surface::{Surface, WindowSize};
+use surface::{DrawSurface, Surface, WindowSize};
 use plugins::PluginManager;
 use raylib::prelude::*;
 
@@ -26,7 +26,7 @@ fn main() -> Result<(), AppError> {
 
     while !rl.window_should_close() {
         plugin_manager.tick()?;
-        if let Err(e) = surface.populate_from_plugins(plugin_manager.get_plugins()) { println!("Error populating frame: {e}") }
+        if let Err(e) = plugin_manager.draw(&mut surface) { println!("Error populating frame: {e}") }
         let mut d = rl.begin_drawing(&thread);
 
         d.clear_background(Color::WHITE);

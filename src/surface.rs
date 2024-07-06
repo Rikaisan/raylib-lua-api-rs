@@ -2,7 +2,7 @@ use mlua::UserData;
 use raylib::drawing::RaylibDrawHandle;
 use std::collections::VecDeque;
 
-use crate::{plugins::Plugin, shapes::{Circle, DrawShape}};
+use crate::{plugins::PluginManager, shapes::{Circle, DrawShape}, PluginError};
 
 #[derive(Default)]
 pub struct WindowSize(pub i32, pub i32);
@@ -22,24 +22,6 @@ impl Surface {
         while let Some(shape) = self.shapes.pop_front() {
             shape.draw(draw_handle);
         }
-    }
-
-    pub fn populate_from_plugin(&mut self, plugin: &Plugin) -> mlua::Result<()> {
-        plugin.state.scope(|scope| {
-            let surface = scope.create_userdata_ref_mut(self)?;
-            if let Ok(draw) = plugin.state.globals().get::<_, mlua::Function>("Draw") {
-                draw.call(surface)?
-            }
-            Ok(())
-        })?;
-        Ok(())
-    }
-
-    pub fn populate_from_plugins(&mut self, plugins: Vec<&Plugin>) -> mlua::Result<()> {
-        for plugin in plugins.iter() {
-            self.populate_from_plugin(plugin)?;
-        }
-        Ok(())
     }
 }
 
@@ -64,5 +46,24 @@ impl UserData for Surface {
                 )
             )
         });
+    }
+}
+
+pub trait DrawSurface<E> {
+    fn draw(&self, surface: &mut Surface) -> Result<(), E>;
+}
+
+impl DrawSurface<PluginError> for PluginManager {
+    fn draw(&self, surface: &mut Surface) -> Result<(), PluginError> {
+        for plugin in self.get_plugins().iter() {
+            plugin.state.scope(|scope| {
+                let surface = scope.create_userdata_ref_mut(surface)?;
+                if let Ok(draw) = plugin.state.globals().get::<_, mlua::Function>("Draw") {
+                    draw.call(surface)?
+                }
+                Ok(())
+            })?
+        }
+        Ok(())
     }
 }
