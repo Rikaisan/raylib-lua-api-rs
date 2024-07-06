@@ -1,9 +1,10 @@
 mod shapes;
+mod surface;
 
 use std::{fs::File, io::Read, path::PathBuf};
 use raylib::prelude::*;
 use mlua::prelude::*;
-use shapes::Screen;
+use surface::Surface;
 
 fn get_lua_state(file_path: impl Into<PathBuf>, app_name: &str) -> Result<Lua, LuaError> {
     let mut file_content = String::new();
@@ -19,10 +20,10 @@ fn get_title(lua: &Lua) -> Result<String, LuaError> {
     lua.globals().get::<_, String>("TITLE")
 }
 
-fn populate_external_surface(lua: &Lua, screen: &mut Screen) -> mlua::Result<()> {
+fn populate_external_surface(lua: &Lua, surface: &mut Surface) -> mlua::Result<()> {
     lua.scope(|scope| {
-        let screen = scope.create_userdata_ref_mut(screen)?;
-        lua.globals().get::<_, LuaFunction>("Draw")?.call(screen)
+        let surface = scope.create_userdata_ref_mut(surface)?;
+        lua.globals().get::<_, LuaFunction>("Draw")?.call(surface)
     })
 }
 
@@ -40,10 +41,10 @@ fn main() {
     let title = get_title(&test_file).unwrap_or("LuaShapes".into());
     let text_size = rl.get_font_default().measure_text(title.as_str(), 20.0, 2.0);
 
-    let mut screen: Screen = Screen::new(window_width, window_height);
+    let mut surface: Surface = Surface::new(window_width, window_height);
 
     while !rl.window_should_close() {
-        if let Err(e) = populate_external_surface(&test_file, &mut screen) { println!("Error populating frame: {e}") }
+        if let Err(e) = populate_external_surface(&test_file, &mut surface) { println!("Error populating frame: {e}") }
         let mut d = rl.begin_drawing(&thread);
 
         d.clear_background(Color::WHITE);
@@ -57,6 +58,6 @@ fn main() {
             Color::GRAY
         );
 
-        screen.draw(&mut d);
+        surface.draw(&mut d);
     }
 }
