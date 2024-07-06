@@ -10,12 +10,13 @@ pub struct WindowSize(pub i32, pub i32);
 #[derive(Default)]
 pub struct Surface {
     window_size: WindowSize,
+    color_map: ColorMap,
     shapes: VecDeque<Box<dyn DrawShape>>
 }
 
 impl Surface {
     pub fn new(window_size: WindowSize) -> Self {
-        Self { window_size, shapes: VecDeque::new() }
+        Self { window_size, color_map: ColorMap::new(), shapes: VecDeque::new() }
     }
 
     pub fn draw(&mut self, draw_handle: &mut RaylibDrawHandle) {
@@ -39,11 +40,10 @@ impl UserData for Surface {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method_mut("draw_circle", |_, surface, (x, y, radius, color)| {
             let color: String = color;
-            let color_map = ColorMap::default();
             Ok(
                 surface.shapes.push_back(
                     Box::new(
-                        Circle::new(x, y, radius, color_map.from(color).unwrap_or(Color::BLACK))
+                        Circle::new(x, y, radius, surface.color_map.from(color).unwrap_or(Color::BLACK))
                     )
                 )
             )
@@ -51,11 +51,10 @@ impl UserData for Surface {
 
         methods.add_method_mut("draw_rectangle", |_, surface, (x, y, width, height, color)| {
             let color: String = color;
-            let color_map = ColorMap::default();
             Ok(
                 surface.shapes.push_back(
                     Box::new(
-                        Rectangle::new(x, y, width, height, color_map.from(color).unwrap_or(Color::BLACK))
+                        Rectangle::new(x, y, width, height, surface.color_map.from(color).unwrap_or(Color::BLACK))
                     )
                 )
             )

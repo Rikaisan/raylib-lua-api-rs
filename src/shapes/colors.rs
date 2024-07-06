@@ -6,6 +6,10 @@ pub struct ColorMap {
     pub map: HashMap<String, Color>
 }
 
+impl ColorMap {
+    pub fn new() -> Self { Self::default() }
+}
+
 impl Default for ColorMap {
     fn default() -> Self {
         Self {
