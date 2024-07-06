@@ -4,7 +4,7 @@ mod surface;
 use std::{fs::File, io::Read, path::PathBuf};
 use raylib::prelude::*;
 use mlua::prelude::*;
-use surface::Surface;
+use surface::{Surface, WindowSize};
 
 fn get_lua_state(file_path: impl Into<PathBuf>, app_name: &str) -> Result<Lua, LuaError> {
     let mut file_content = String::new();
@@ -28,11 +28,10 @@ fn populate_external_surface(lua: &Lua, surface: &mut Surface) -> mlua::Result<(
 }
 
 fn main() {
-    let window_width = 640;
-    let window_height = 480;
+    let window_size = WindowSize(640, 480);
 
     let (mut rl, thread) = raylib::init()
-        .size(window_width, window_height)
+        .size(window_size.0, window_size.1)
         .title("Hello, World!")
         .build();
 
@@ -41,7 +40,7 @@ fn main() {
     let title = get_title(&test_file).unwrap_or("LuaShapes".into());
     let text_size = rl.get_font_default().measure_text(title.as_str(), 20.0, 2.0);
 
-    let mut surface: Surface = Surface::new(window_width, window_height);
+    let mut surface: Surface = Surface::new(window_size);
 
     while !rl.window_should_close() {
         if let Err(e) = populate_external_surface(&test_file, &mut surface) { println!("Error populating frame: {e}") }

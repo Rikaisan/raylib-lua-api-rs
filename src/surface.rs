@@ -9,14 +9,13 @@ pub struct WindowSize(pub i32, pub i32);
 
 #[derive(Default)]
 pub struct Surface {
-    window_width: i32,
-    window_height: i32,
+    window_size: WindowSize,
     shapes: VecDeque<Box<dyn DrawShape>>
 }
 
 impl Surface {
-    pub fn new(window_width: i32, window_height: i32) -> Self {
-        Self { window_width, window_height, shapes: VecDeque::new() }
+    pub fn new(window_size: WindowSize) -> Self {
+        Self { window_size, shapes: VecDeque::new() }
     }
 
     pub fn draw(&mut self, draw_handle: &mut RaylibDrawHandle) {
@@ -30,8 +29,8 @@ impl UserData for Surface {
     fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
         fields.add_field_method_get("size", |lua, surface| {
             let tbl = lua.create_table()?;
-            tbl.set("x", surface.window_width)?;
-            tbl.set("y", surface.window_height)?;
+            tbl.set("x", surface.window_size.0)?;
+            tbl.set("y", surface.window_size.1)?;
             Ok(tbl)
         });
     }
