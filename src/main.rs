@@ -3,12 +3,11 @@ mod surface;
 mod shapes;
 mod error;
 
-use error::*;
 use surface::{DrawSurface, Surface, WindowSize};
 use plugins::PluginManager;
 use raylib::prelude::*;
 
-fn main() -> Result<(), AppError> {
+fn main() -> Result<(), error::AppError> {
     let window_size = WindowSize(640, 480);
 
     let (mut rl, thread) = raylib::init()

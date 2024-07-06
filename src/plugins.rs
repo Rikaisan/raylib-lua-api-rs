@@ -1,8 +1,7 @@
+#![allow(dead_code)]
 use std::{collections::HashMap, fs::File, io::Read, path::PathBuf};
-
-use mlua::prelude::*;
-
 use crate::error::PluginError;
+use mlua::prelude::*;
 
 
 #[derive(Debug, Default)]

@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use raylib::drawing::RaylibDrawHandle;
 
 pub trait DrawShape {

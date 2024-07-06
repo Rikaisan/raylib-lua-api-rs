@@ -1,8 +1,8 @@
-use mlua::UserData;
+use crate::{plugins::PluginManager, shapes::{Circle, DrawShape}, error::PluginError};
 use raylib::drawing::RaylibDrawHandle;
 use std::collections::VecDeque;
+use mlua::UserData;
 
-use crate::{plugins::PluginManager, shapes::{Circle, DrawShape}, PluginError};
 
 #[derive(Default)]
 pub struct WindowSize(pub i32, pub i32);
