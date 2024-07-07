@@ -72,7 +72,9 @@ impl DrawSurface<PluginError> for PluginManager {
             plugin.state.scope(|scope| {
                 let surface = scope.create_userdata_ref_mut(surface)?;
                 if let Ok(draw) = plugin.state.globals().get::<_, mlua::Function>("Draw") {
-                    draw.call(surface)?
+                    let result = draw.call(surface);
+                    if result.is_err() { log::error!("Error while calling Draw on {}", plugin.name) }
+                    result?
                 }
                 Ok(())
             })?

@@ -51,7 +51,9 @@ impl PluginManager {
     pub fn tick(&self) -> Result<(), PluginError> {
         for plugin in self.plugins.values() {
             if let Ok(update) = plugin.state.globals().get::<_, LuaFunction>("Update") {
-                update.call(())?
+                let result = update.call(());
+                if result.is_err() { log::error!("Error while calling Update on {}", plugin.name) }
+                result?
             }
         }
         Ok(())
