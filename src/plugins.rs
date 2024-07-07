@@ -31,9 +31,18 @@ impl PluginManager {
                 let lua = Lua::new();
                 lua.load(file_buffer).exec()?;
 
-                let name = lua.globals().get::<_, String>("PLUGIN_NAME").map_err(|_|PluginError::PluginNameMissing(entry.as_ref().unwrap().file_name().into_string().unwrap()))?;
-                if manager.plugins.contains_key(&name) { return Err(PluginError::PluginExists(name)) }
-                manager.plugins.insert(name.clone(), Plugin { name, state: lua });
+                let file_name = entry.as_ref().unwrap().file_name().into_string().unwrap();
+                let name = lua.globals().get::<_, String>("PLUGIN_NAME").map_err(|_| {
+                    log::warn!("Plugin {} doesn't define PLUGIN_NAME, skipping...", &file_name);
+                    PluginError::PluginNameMissing(file_name.clone())
+                })?;
+
+                if manager.plugins.contains_key(&name) {
+                    log::warn!("Plugin {} defines PLUGIN_NAME={} which already exists, skipping...", file_name, name);
+                    return Err(PluginError::PluginExists(name))
+                }
+                manager.plugins.insert(name.clone(), Plugin { name: name.clone(), state: lua });
+                log::info!("Plugin {}[{}] loaded successfully!", name, file_name);
             }
         }
         Ok(manager)

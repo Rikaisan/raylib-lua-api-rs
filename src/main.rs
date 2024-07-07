@@ -8,6 +8,9 @@ use plugins::PluginManager;
 use raylib::prelude::*;
 
 fn main() -> Result<(), error::AppError> {
+    if std::env::var("RUST_LOG").is_err() { std::env::set_var("RUST_LOG", "info") }
+    env_logger::init();
+
     let window_size = WindowSize(640, 480);
 
     let (mut rl, thread) = raylib::init()
