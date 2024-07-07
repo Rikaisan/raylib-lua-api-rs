@@ -8,14 +8,14 @@ pub enum PluginError {
     PluginNameMissing(String),
     #[error("plugin with the name '{0}' already exists!")]
     PluginExists(String),
-    #[error("error loading plugins")]
+    #[error(transparent)]
     IOError(#[from] io::Error),
-    #[error("error executing lua file")]
+    #[error(transparent)]
     LuaError(#[from] mlua::Error)
 }
 
 #[derive(Error, Debug)]
 pub enum AppError {
-    #[error("a plugin error ocurred")]
+    #[error(transparent)]
     PluginError(#[from] PluginError)
 }
